@@ -11,7 +11,9 @@ window.addEventListener("resize", () => {
 const particlesArray = [];
 const enemiesArray = [];
 let hue = 0;
-let count = 0;
+let counter = 0;
+const enemyFps = 2;
+let score = 0;
 
 let circle = {
   x: canvas.width / 2 - 40,
@@ -27,28 +29,35 @@ let bullet = {
   radius: 5,
 };
 
-let enemy = {
-  x: undefined,
-  y: undefined,
-  speed: 5,
-  radius: Math.floor(Math.random() * 50) + 10,
-};
-
 let mouse = {
   x: undefined,
   y: undefined,
 };
 
-canvas.addEventListener("click", function (e) {
-  mouse.x = e.x;
-  mouse.y = e.y;
-  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
-});
-canvas.addEventListener("mousemove", function (e) {
-  mouse.x = e.x;
-  mouse.y = e.y;
-  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
-});
+function gameLoop() {
+  requestAnimationFrame(gameLoop);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  update();
+  draw();
+}
+function draw() {
+  drawCircle(ctx, circle.x, circle.y, circle.radius, "#fff");
+}
+function update() {
+  newEnemy();
+  handleArray();
+  handleArrayEnemies();
+  bang();
+  hue += 5;
+}
+
+function newEnemy() {
+  counter++;
+  if (counter !== 60 / enemyFps) return;
+  enemiesArray.push(new Enemy());
+  counter = 0;
+}
 
 function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
   ctx.beginPath();
@@ -79,25 +88,38 @@ function handleArray() {
     }
   }
 }
+function handleArrayEnemies() {
+  for (let i = 0; i < enemiesArray.length; i++) {
+    enemiesArray[i].draw();
+    enemiesArray[i].update();
 
-class Particle {
-  constructor(props) {
-    this.x = props.x;
-    this.y = props.y;
-    this.size = 10;
-    this.speed = 10;
-    this.rad = Math.atan2(mouse.y - circle.y, mouse.x - circle.x);
-    this.color = "hsl(" + hue + ", 100%, 50%)";
+    if (
+      enemiesArray[i].x > canvas.width ||
+      enemiesArray[i].x < 0 ||
+      enemiesArray[i].y > canvas.height ||
+      enemiesArray[i].y < 0
+    ) {
+      enemiesArray.splice(i, 1);
+    }
   }
-  update() {
-    this.x += this.speed * Math.cos(this.rad);
-    this.y += this.speed * Math.sin(this.rad);
-  }
-  draw() {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
+}
+function bang() {
+  for (var i = 0; i < enemiesArray.length; i++) {
+    for (var j = 0; j < particlesArray.length; j++) {
+      let distanceX = particlesArray[j].x - enemiesArray[i].x;
+      let distanceY = particlesArray[j].y - enemiesArray[i].y;
+      let realDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      if (realDistance < particlesArray[j].size + enemiesArray[i].size) {
+        console.log("bang");
+        particlesArray.splice(j, 1);
+        enemiesArray[i].size--;
+
+        if (enemiesArray[i].size < 10) {
+          enemiesArray.splice(i, 1);
+        }
+        score++;
+      }
+    }
   }
 }
 
@@ -105,32 +127,17 @@ function randomInc(min, max) {
   return Math.floor(Math.random() * (max - min)) + Math.min;
 }
 
-function enemyFunc() {
-  let x;
-  let y;
-  if (Math.random() > 0.5) {
-    x = Math.floor(Math.random() * canvas.width);
-    y = Math.random() > 0.5 ? 0 : canvas.height;
-  } else {
-    x = Math.random() > 0.5 ? 0 : canvas.width;
-    y = Math.floor(Math.random() * canvas.height);
-  }
+////////////////////////////////////// events
+canvas.addEventListener("click", function (e) {
+  mouse.x = e.x;
+  mouse.y = e.y;
+  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
+});
+canvas.addEventListener("mousemove", function (e) {
+  mouse.x = e.x;
+  mouse.y = e.y;
+  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
+});
 
-  enemiesArray.push(new Particle({ x, y }));
-}
-
-// -----------------------------------------------------------------------
-function gameLoop() {
-  requestAnimationFrame(gameLoop);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  handleArray();
-  drawCircle(ctx, circle.x, circle.y, circle.radius, "#fff");
-  enemyFunc(randomInc);
-
-  console.log(enemiesArray);
-
-  hue += 5;
-}
-
+///////////// run
 gameLoop();
