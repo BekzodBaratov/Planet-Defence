@@ -19,7 +19,7 @@ let enemiesArray = [];
 const enemiesAnimation = [];
 let hue = 0;
 let counter = 0;
-const enemyFps = 0.5;
+let enemyEvery = 120;
 let score = 0;
 let animationId = null;
 
@@ -65,7 +65,7 @@ function update() {
 
 function newEnemy() {
   counter++;
-  if (counter !== 60 / enemyFps) return;
+  if (counter < enemyEvery) return;
   enemiesArray.push(new Enemy());
   counter = 0;
 }
@@ -153,8 +153,10 @@ function bang() {
 
         score++;
         if (enemiesArray[i].size > 10) continue;
+        if (score > 125) {
+          enemyEvery -= 1;
+        }
         enemiesArray.splice(i, 1);
-        i++;
       }
     }
   }
@@ -171,17 +173,20 @@ function enemiesAnimaFunction() {
 function randomInc(min, max) {
   return Math.floor(Math.random() * (max - min)) + Math.min;
 }
-
+function eventPlugin(x, y) {
+  mouse.x = x;
+  mouse.y = y;
+  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
+}
 ////////////////////////////////////// events
 canvas.addEventListener("click", function (e) {
-  mouse.x = e.x;
-  mouse.y = e.y;
-  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
+  eventPlugin(e.x, e.y);
 });
 canvas.addEventListener("mousemove", function (e) {
-  mouse.x = e.x;
-  mouse.y = e.y;
-  particlesArray.push(new Particle({ x: circle.x, y: circle.y }));
+  eventPlugin(e.x, e.y);
+});
+window.addEventListener("touchmove", function (e) {
+  eventPlugin(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 });
 retryBtn.addEventListener("click", function () {
   enemiesArray = [];

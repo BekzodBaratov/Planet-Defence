@@ -3,6 +3,7 @@ body {
   margin: 0;
   box-sizing: border-box;
   overflow: hidden;
+  width: 100%;
 }
 #canvas {
   background-color: black;
