@@ -73,9 +73,9 @@ function newEnemy() {
 function drawScore() {
   ctx.fillStyle = "black";
   ctx.beginPath();
-  ctx.font = "24px Arial";
+  ctx.font = "1.5rem Arial";
   ctx.textAlign = "center";
-  ctx.fillText(score, canvas.width / 2, canvas.height / 2 + 7);
+  ctx.fillText(score == 0 ? "" : score, canvas.width / 2, canvas.height / 2 + 7);
   ctx.fill();
 }
 
