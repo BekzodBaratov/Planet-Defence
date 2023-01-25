@@ -8,3 +8,41 @@ body {
   background-color: black;
   border: 1px solid black;
 }
+.gameOver {
+  position: absolute;
+  inset: 0;
+  background: #0006;
+  backdrop-filter: blur(8px);
+  color: white;
+  display: none;
+
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+}
+.gameOver h2 {
+  font-size: 3rem;
+  padding-bottom: 0;
+  margin-bottom: 1rem;
+}
+.gameOver > div {
+  display: flex;
+  gap: 1rem;
+  font-size: 1.4rem;
+}
+.gameOver button {
+  padding: 0.5rem 2rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: 200ms;
+}
+.gameOver button:hover {
+  background: #fff9;
+}
+.gameOver button:active {
+  transform: scale(0.8);
+}
